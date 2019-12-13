@@ -8,3 +8,11 @@ See the S4 manual, in doc/index.html, for a complete
 description of the package and its user interface, as well as
 installation instructions, the license and copyright, contact
 addresses, and other important information.
+
+# building python extension:
+```
+make clean
+make boost
+make 
+make S4_pyext
+```
