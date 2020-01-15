@@ -638,6 +638,25 @@ static PyObject *S4Sim_new(PyTypeObject *type, PyObject *args, PyObject *kwds){
 	return (PyObject*)self;
 }
 
+
+static PyObject *S4Sim_SetLattice(S4Sim* self, PyObject *args, PyObject *kwds){
+	double Lr[4];
+	static char *kwlist[] = { "Lattice", NULL };
+
+	if(!PyArg_ParseTupleAndKeywords(args, kwds, "O&:SetLattice", kwlist, &lattice_converter, &(Lr[0]))){ return NULL; }
+	
+	self->S.Lr[0] = Lr[0];
+	self->S.Lr[1] = Lr[1];
+	self->S.Lr[2] = Lr[2];
+	self->S.Lr[3] = Lr[3];
+	int err;
+	err = Simulation_MakeReciprocalLattice(&(self->S));
+    // if (err != 0){
+    //     HandleSolutionErrorCode("Simulation_LoadSolution", err);
+    // }
+	Py_RETURN_NONE;
+}
+
 static void S4Sim_dealloc(S4Sim* self){
 	Simulation_Destroy(&(self->S));
 	Py_TYPE(self)->tp_free((PyObject*)self);
@@ -1956,6 +1975,7 @@ static PyMethodDef	S4Interpolator_methods[] =
 static PyMethodDef S4Sim_methods[] = {
 	{"Clone"            , (PyCFunction)S4Sim_Clone, METH_NOARGS, PyDoc_STR("Clone() -> S4.Simulation")},
 	/* Specification */
+	{"SetLattice"				, (PyCFunction)S4Sim_SetLattice, METH_VARARGS | METH_KEYWORDS, PyDoc_STR("AddLattice(((u_x,u_y),(v_x,v_y))) -> None")},
 	{"AddMaterial"				, (PyCFunction)S4Sim_AddMaterial, METH_VARARGS | METH_KEYWORDS, PyDoc_STR("AddMaterial(name,eps) -> None")},
 	{"SetMaterial"				, (PyCFunction)S4Sim_SetMaterial, METH_VARARGS | METH_KEYWORDS, PyDoc_STR("SetMaterial(name,eps) -> None")},
 	{"AddLayer"					, (PyCFunction)S4Sim_AddLayer, METH_VARARGS | METH_KEYWORDS, PyDoc_STR("AddLayer(name,thickness,matname) -> None")},
