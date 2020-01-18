@@ -51,6 +51,10 @@
 void fft_init(void);
 void fft_destroy(void);
 
+#if PY_MAJOR_VERSION >= 3
+//https://readthedocs.org/projects/py3c/downloads/pdf/latest/
+#define PyString_Check(...) PyUnicode_Check(__VA_ARGS__)
+#endif
 
 static int CheckPyNumber(PyObject *obj){
 	return PyFloat_Check(obj) || PyLong_Check(obj)
@@ -107,6 +111,20 @@ static long GetPyInt(PyObject *obj){
 #else
 	return PyLong_AsLong(obj);
 #endif
+}
+
+static char* GetPyStringAndSize(PyObject *obj, Py_ssize_t *size)
+{
+
+//#define PyString_AsStringAndSize(...) PyUnicode_AsUTF8AndSize(__VA_ARGS__)
+#if PY_MAJOR_VERSION < 3
+    char* c = NULL;
+    PyString_AsStringAndSize(obj, &c, size);
+    return c;
+#else
+    return PyUnicode_AsUTF8AndSize(obj,size);
+#endif
+
 }
 
 void HandleSolutionErrorCode(const char *fname, int code){
@@ -339,7 +357,7 @@ int excitation_converter(PyObject *obj, S4Excitation_Data *data)
 			PyErr_SetString(PyExc_TypeError, "the G index must be a integer.");
 			return 0;
 		}
-		data->exg[2 * i + 0] = PyInt_AsLong(pj);
+		data->exg[2 * i + 0] = GetPyInt(pj);
 
 		//get polarization: 'x' or 'y'
 		pj = PyTuple_GetItem(pi, 1);
@@ -348,7 +366,7 @@ int excitation_converter(PyObject *obj, S4Excitation_Data *data)
 			PyErr_SetString(PyExc_TypeError, "polalization should be specified by 'x' or 'y'.");
 			return 0;
 		}
-		PyString_AsStringAndSize(pj, &pol, &polLen);
+        pol = GetPyStringAndSize(pj, &polLen);
 		if(1 != polLen || ('x' != pol[0] && 'y' != pol[0]))
 		{
 			PyErr_SetString(PyExc_TypeError, "polalization should be specified by 'x' or 'y'.");
@@ -830,7 +848,7 @@ static PyObject *S4Sim_SetRegionCircle(S4Sim *self, PyObject *args, PyObject *kw
 	Py_RETURN_NONE;
 }
 static PyObject *S4Sim_SetRegionEllipse(S4Sim *self, PyObject *args, PyObject *kwds){
-	static char *kwlist[] = { "S4_Layer", "S4_Material", "Center", "Angle", "Halfwidths", NULL };
+    static char *kwlist[] = { "Layer", "Material", "Center", "Angle", "Halfwidths", NULL };
 	S4_Layer *layer;
 	S4_Material *M;
 	const char *layername;
@@ -946,7 +964,7 @@ static PyObject *S4Sim_SetExcitationExterior(S4Sim *self, PyObject *args, PyObje
 		return NULL;
 	}
 
-	err = Simulation_MakeExcitationExterior(self->S, exciData.n, exciData.exg, exciData.ex);
+    err = S4_Simulation_ExcitationExterior(self->S, exciData.n, exciData.exg, exciData.ex);
 	free(exciData.exg); exciData.exg = NULL;
 	free(exciData.ex); exciData.ex = NULL;
 	if(0 != err)

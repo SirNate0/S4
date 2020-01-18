@@ -1929,6 +1929,9 @@ int S4_Simulation_GetPowerFlux(S4_Simulation *S, S4_Layer *layer, const double *
 	return 0;
 }
 
+int Simulation_GetPoyntingFlux(S4_Simulation *S, S4_Layer *layer, double offset, double powers[4])
+{return S4_Simulation_GetPowerFlux(S,layer,&offset,powers);}
+
 int Simulation_GetPoyntingFluxByG(S4_Simulation *S, S4_Layer *layer, double offset, double *powers){
 	S4_TRACE("> Simulation_GetPoyntingFluxByG(S=%p, layer=%p, offset=%f, powers=%p) [omega=%f]\n",
 		S, layer, offset, powers, S->omega[0]);
@@ -3292,7 +3295,7 @@ int S4_Simulation_ExcitationDipole(S4_Simulation *S, const double k[2], const ch
 }
 
 int S4_Simulation_ExcitationExterior(S4_Simulation *S, int n, const int *exg, const double *ex){
-	S4_TRACE("> Simulation_MakeExcitationExterior(S=%p, n=%d, exg=%p, ex=%p)\n", S,
+    S4_TRACE("> S4_Simulation_ExcitationExterior(S=%p, n=%d, exg=%p, ex=%p)\n", S,
 		n, exg, ex);
 	int ret = 0;
 	if(NULL == S){ ret = -1; }
@@ -3300,7 +3303,7 @@ int S4_Simulation_ExcitationExterior(S4_Simulation *S, int n, const int *exg, co
 	if(NULL == exg){ ret = -3; }
 	if(NULL == ex){ ret = -4; }
 	if(0 != ret){
-		S4_TRACE("< Simulation_MakeExcitationExterior (failed; ret = %d)\n", ret);
+        S4_TRACE("< S4_Simulation_ExcitationExterior (failed; ret = %d)\n", ret);
 		return ret;
 	}
 
@@ -3315,7 +3318,7 @@ int S4_Simulation_ExcitationExterior(S4_Simulation *S, int n, const int *exg, co
 	ext->coeff = (double*)malloc(sizeof(double) * 2*n);
 	memcpy(ext->coeff, ex, sizeof(double) * 2*n);
 
-	S4_TRACE("< Simulation_MakeExcitationExterior\n");
+    S4_TRACE("< S4_Simulation_ExcitationExterior\n");
 	return 0;
 }
 
