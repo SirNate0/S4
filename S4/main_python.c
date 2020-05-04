@@ -848,7 +848,7 @@ static PyObject *S4Sim_SetRegionCircle(S4Sim *self, PyObject *args, PyObject *kw
 	Py_RETURN_NONE;
 }
 static PyObject *S4Sim_SetRegionEllipse(S4Sim *self, PyObject *args, PyObject *kwds){
-    static char *kwlist[] = { "Layer", "Material", "Center", "Angle", "Halfwidths", NULL };
+	static char *kwlist[] = { "S4_Layer", "S4_Material", "Center", "Angle", "Halfwidths", NULL };
 	S4_Layer *layer;
 	S4_Material *M;
 	const char *layername;
