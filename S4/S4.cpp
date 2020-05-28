@@ -2267,7 +2267,7 @@ S4_Material* Simulation_GetMaterialByName(const S4_Simulation *S, const char *na
 	for(int i = 0; i < S->n_materials; ++i){
 		if(0 == strcmp(S->material[i].name, name)){
 			if(NULL != index){ *index = i; }
-			S4_TRACE("< Simulation_GetMaterialByName returning %s [omega=%f]\n", S->material[i].name, S->omega[0]);
+            S4_TRACE("< Simulation_GetMaterialByName returning %s [omega=%f]\n", S->material[i].name, S->omega[0]);
 			return &(S->material[i]);
 		}
 	}
@@ -2932,7 +2932,8 @@ int Simulation_GetEpsilon(S4_Simulation *S, const double r[3], double eps[2]){
 	{
 		double z = 0;
 		int i;
-		for(i = 0; i < S->n_layers && r[2] > z+S->layer[i].thickness; ++i){
+        /// NEL: Fixed this, which could return S->layer[S->n_layers] before.
+        for(i = 0; i+1 < S->n_layers && r[2] > z+S->layer[i].thickness; ++i){
 			z += S->layer[i].thickness;
 		}
 		L = &(S->layer[i]);
